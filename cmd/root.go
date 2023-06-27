@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -21,6 +20,7 @@ import (
 var (
 	Email  string
 	Passwd string
+	Domain string
 )
 
 var rootCmd = &cobra.Command{
@@ -41,6 +41,7 @@ func Execute() {
 func init() {
 	rootCmd.Flags().StringVarP(&Email, "email", "e", "", "email")
 	rootCmd.Flags().StringVarP(&Passwd, "passwd", "p", "", "password")
+	rootCmd.Flags().StringVarP(&Domain, "domain", "d", "", "freewhale.xyz")
 }
 
 func FreeWhalefunc(cmd *cobra.Command, args []string) {
@@ -69,7 +70,8 @@ func Login(email, passwd string) ([]*http.Cookie, error) {
 	form := url.Values{}
 	form.Add("email", email)
 	form.Add("passwd", passwd)
-	resp, err := http.DefaultClient.PostForm("https://www.freewhale.us/auth/login", form)
+	url := "https://" + Domain + "/auth/login"
+	resp, err := http.DefaultClient.PostForm(url, form)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +103,8 @@ func Login(email, passwd string) ([]*http.Cookie, error) {
 }
 
 func Checkin(cookies []*http.Cookie) error {
-	request, err := http.NewRequest("POST", "https://www.freewhale.us/user/checkin", nil)
+	url := "https://" + Domain + "/user/checkin"
+	request, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		return err
 	}
